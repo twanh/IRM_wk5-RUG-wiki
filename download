@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Download the Wikipedia page for the Rijksuniversiteit Groningen.
+# The original url is: https://nl.wikipedia.org/wiki/Rijksuniversiteit_Groningen
+#
+# This download script uses a different URL because it provides the same data
+# as is shown on the official page but in a text only format. This download URL
+# is provided by Wikipedia itself and contains all the data but no html/xml tags.
+#
+# Usage:
+# ./download [filename]
+#
+# The filename option can be used to save the file to a custom location.
+# If no filename is given the output is saved to 'wikipedia_rug_[current date].txt'
+# where [current date] is the current date (formatted as: dd_mm_yyyy).
+
+
+URL="https://nl.wikipedia.org/w/index.php?title=Rijksuniversiteit_Groningen&action=raw"
+
+OUTFILE=$1
+
+function download_rug_wiki() {
+  echo Downloading wikipedia page for the Rijksuniversiteit Groningen
+  echo using url: $URL
+  curl --silent $URL -o $1
+  echo Downloaded the wikipedia page, saved as $1
+}
+
+
+if [[ -z $OUTFILE ]]
+then
+  download_rug_wiki "wikipedia_rug_"`date +%d_%m_%Y`".txt"
+else
+  download_rug_wiki $OUTFILE
+fi
+
+
