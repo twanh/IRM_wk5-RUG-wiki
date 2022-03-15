@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Count the occurrences of the dutch article "de" in the given
+# text file, or in the most recent version of the wikipedia_rug text file.
+#
+# Usage ./count_de [filename]
+#
+# The filename option can be used to count the occurrences of "de" in a specific
+# (text) file.
+# If the filename option is left blank or is not a file, the script looks
+# for all files starting with `wikipedia_rug_` and uses the file with the most
+# recent date suffix to count the word 'de' in.
+
+INFILE=$1
+
+function count_de_case_insensitive() {
+  echo "Count of 'de' (case insensitive) in $1:"
+  # grep command:
+  # -w only find words
+  # -i makes it case insensitive
+  # -o puts all occurrences on a new line (so it can be counted correctly)
+  cat $1 | grep -wio "de" | wc -l
+}
+
+function count_de_case_sensitive() {
+  echo "Count of 'de' (case sensitive) in $1:"
+  # grep command:
+  # -w only find words
+  # -o puts all occurrences on a new line (so it can be counted correctly)
+  cat $1 | grep -wo "de" | wc -l
+}
+
+if [[ ! -a $INFILE ]]
+then
+  # When no $INFILE is given:
+  # get the wikipedia_rug_[date].txt with the most recent date (ddmmyyyy) suffix
+  # from the current directory.
+  FILE=`ls | grep "^wikipedia_rug_" | sort -t"_" -k5 -k4 -k3 | tail -1`
+
+  # Exit (with code 1) when there is no $INFILE and no
+  # recent file could be found.
+  if [[ ! -a $FILE ]]
+  then
+    echo "No file could be found to process."
+    exit 1
+  fi
+
+  count_de_case_insensitive $FILE
+  count_de_case_sensitive $FILE
+else
+  count_de_case_insensitive $INFILE
+  count_de_case_sensitive $INFILE
+fi
